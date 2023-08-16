@@ -1536,6 +1536,8 @@ def cli_split_command(com):
     exp = r'(?:(?<=\s)|^)"(.*?)"(?=\s|$)|(\S+)'
     split_array = regex.findall(exp, com)
     split_array = [group[0] if group[0] else group[1] for group in split_array]
+    for a in split_array:
+        print(a)
     return split_array
 
 
@@ -1554,32 +1556,23 @@ def cli_infer(com):
     f0_file = None  # Not Implemented Yet
 
     # Get parameters for inference
-    speaker_id = int(com[4])
-    transposition = float(com[5])
-    f0_method = com[6]
-    crepe_hop_length = int(com[7])
-    harvest_median_filter = int(com[8])
-    resample = int(com[9])
-    mix = float(com[10])
-    feature_ratio = float(com[11])
-    protection_amnt = float(com[12])
+    speaker_id = 0
+    transposition = 0
+    f0_method = "rmvpe"
+    crepe_hop_length = 160
+    harvest_median_filter = 3
+    resample = 0
+    mix = 1
+    feature_ratio = 0.78
+    protection_amnt = 0.5
     protect1 = 0.5
 
-    if com[14] == "False" or com[14] == "false":
-        DoFormant = False
-        Quefrency = 0.0
-        Timbre = 0.0
-        CSVutil(
-            "csvdb/formanting.csv", "w+", "formanting", DoFormant, Quefrency, Timbre
-        )
-
-    else:
-        DoFormant = True
-        Quefrency = float(com[15])
-        Timbre = float(com[16])
-        CSVutil(
-            "csvdb/formanting.csv", "w+", "formanting", DoFormant, Quefrency, Timbre
-        )
+    DoFormant = False
+    Quefrency = 0.0
+    Timbre = 0.0
+    CSVutil(
+        "csvdb/formanting.csv", "w+", "formanting", DoFormant, Quefrency, Timbre
+    )
 
     print("Mangio-RVC-Fork Infer-CLI: Starting the inference...")
     vc_data = get_vc(model_name, protection_amnt, protect1)
@@ -1607,13 +1600,12 @@ def cli_infer(com):
             % ("audio-outputs", output_file_name)
         )
         wavfile.write(
-            "%s/%s" % ("audio-outputs", output_file_name),
+            output_file_name,
             conversion_data[1][0],
             conversion_data[1][1],
         )
         print(
-            "Mangio-RVC-Fork Infer-CLI: Finished! Saved output to %s/%s"
-            % ("audio-outputs", output_file_name)
+            f"Mangio-RVC-Fork Infer-CLI: Finished! Saved output to {output_file_name}"
         )
     else:
         print("Mangio-RVC-Fork Infer-CLI: Inference failed. Here's the traceback: ")
